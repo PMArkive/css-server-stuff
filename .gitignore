@@ -1,0 +1,9 @@
+**
+!*/
+
+!.gitignore
+!addons/Tickrate_Enabler*
+!addons/sourcemod/scripting/ezhop.sp
+!addons/sourcemod/scripting/noblock.sp
+!addons/sourcemod/scripting/clcvarstosend.sp
+!addons/sourcemod/scripting/cl_accelerate.sp
