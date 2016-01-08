@@ -38,6 +38,7 @@ void RemoveWeaponInSlot(client, slot)
 public Action Command_glock(int client, int args)
 {
 	RemoveWeaponInSlot(client, 1);
+	GivePlayerItem(client, "weapon_glock", 0);
 	return Plugin_Continue;
 }
 
