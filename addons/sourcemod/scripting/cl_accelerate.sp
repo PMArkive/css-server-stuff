@@ -40,7 +40,7 @@ public Action Command_accel(int client, int args)
 		//usingClientAccel[client] = true;
 		// call native metamod function:
 		// setAccel(client, accelerateValue);
-		ReplyToCommand(client, "[ACCEL] Using custom sv_accelerate")
+		ReplyToCommand(client, "[ACCEL] Using custom sv_accelerate");
 	}
 	else
 	{
@@ -72,7 +72,7 @@ public Action Command_airaccel(int client, int args)
 		//usingClientAirAccel[client] = true;
 		// call native metamod function:
 		// setAirAccel(client, airaccelerateValue);
-		ReplyToCommand(client, "[AIRACCEL] Using custom sv_airaccelerate")
+		ReplyToCommand(client, "[AIRACCEL] Using custom sv_airaccelerate");
 	}
 	else
 	{
