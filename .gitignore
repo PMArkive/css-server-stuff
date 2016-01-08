@@ -7,3 +7,5 @@
 !addons/sourcemod/scripting/noblock.sp
 !addons/sourcemod/scripting/clcvarstosend.sp
 !addons/sourcemod/scripting/cl_accelerate.sp
+!addons/sourcemod/scripting/mpbhops.sp
+!addons/sourcemod/scripting/autohop.sp
