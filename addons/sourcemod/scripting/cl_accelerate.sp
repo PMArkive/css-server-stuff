@@ -11,29 +11,20 @@ public Plugin myinfo =
 	url = "https://www.google.com/"
 }
 
-bool usingClientAccel[MAXPLAYERS+1];
-int clientAccel[MAXPLAYERS+1];
-bool usingClientAirAccel[MAXPLAYERS+1];
-int clientAirAccel[MAXPLAYERS+1];
-
 public void OnPluginStart()
 {
 	RegAdminCmd("sm_accel", Command_accel, 0);
 	RegAdminCmd("sm_airaccel", Command_airaccel, 0);
 }
 
-public void OnClientConnected(client)
-{
-	usingClientAccel[client] = false;
-	usingClientAirAccel[client] = false;
-}
-
 public Action Command_accel(int client, int args)
 {
 	if (args == 0)
 	{
-		usingClientAccel[client] = false;
-		ReplyToCommand(client, "[ACCEL] Stopping client-side sv_accelerate");
+		//usingClientAccel[client] = false;
+		// call native metamod function:
+		// resetAccel(client);
+		ReplyToCommand(client, "[ACCEL] Resetting client-side sv_accelerate");
 	}
 	else if (args == 1)
 	{
@@ -45,8 +36,10 @@ public Action Command_accel(int client, int args)
 			ReplyToCommand(client, "[ACCEL] Invalid value");
 			return Plugin_Continue;
 		}
-		clientAccel[client] = accelerateValue;
-		usingClientAccel[client] = true;
+		//clientAccel[client] = accelerateValue;
+		//usingClientAccel[client] = true;
+		// call native metamod function:
+		// setAccel(client, accelerateValue);
 		ReplyToCommand(client, "[ACCEL] Using custom sv_accelerate")
 	}
 	else
@@ -60,7 +53,9 @@ public Action Command_airaccel(int client, int args)
 {
 	if (args == 0)
 	{
-		usingClientAirAccel[client] = false;
+		//usingClientAirAccel[client] = false;
+		// call native metamod function:
+		// resetAirAccel(client);
 		ReplyToCommand(client, "[AIRACCEL] Stopping client-side sv_airaccelerate");
 	}
 	else if (args == 1)
@@ -73,8 +68,10 @@ public Action Command_airaccel(int client, int args)
 			ReplyToCommand(client, "[AIRACCEL] Invalid value");
 			return Plugin_Continue;
 		}
-		clientAirAccel[client] = airaccelerateValue;
-		usingClientAirAccel[client] = true;
+		//clientAirAccel[client] = airaccelerateValue;
+		//usingClientAirAccel[client] = true;
+		// call native metamod function:
+		// setAirAccel(client, airaccelerateValue);
 		ReplyToCommand(client, "[AIRACCEL] Using custom sv_airaccelerate")
 	}
 	else
