@@ -31,13 +31,15 @@ public Action Command_clcvar(int client, int args)
 	if (convar == null)
 	{
 		ReplyToCommand(client, "[CLCVARS] Invalid ConVar");
-		return Plugin_Continue;
+	}
+	else
+	{
+		char convarValue[51];
+		GetCmdArg(2, convarValue, sizeof(convarValue));
+		SendConVarValue(client, convar, convarValue);
+
+		ReplyToCommand(client, "[CLCVARS] Done");
 	}
 
-	char convarValue[51];
-	GetCmdArg(2, convarValue, sizeof(convarValue));
-	SendConVarValue(client, convar, convarValue);
-
-	ReplyToCommand(client, "[CLCVARS] Done");
 	return Plugin_Continue;
 }

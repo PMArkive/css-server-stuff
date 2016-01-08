@@ -16,13 +16,13 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
-	RegAdminCmd("sm_glock", Command_glock, 0, "give glock");
-	RegAdminCmd("sm_usp", Command_usp, 0, "give usp");
-	RegAdminCmd("sm_knife", Command_knife, 0, "give knife");
-	RegAdminCmd("sm_scout", Command_scout, 0, "give scout");
-	RegAdminCmd("sm_p90", Command_p90, 0, "give p90");
-	RegAdminCmd("sm_m3", Command_m3, 0, "give m3");
-	RegAdminCmd("sm_xm1014", Command_xm1014, 0, "give xm1014");
+	RegAdminCmd("sm_glock", Command_glock, 0);
+	RegAdminCmd("sm_usp", Command_usp, 0);
+	RegAdminCmd("sm_knife", Command_knife, 0);
+	RegAdminCmd("sm_scout", Command_scout, 0);
+	RegAdminCmd("sm_p90", Command_p90, 0);
+	RegAdminCmd("sm_m3", Command_m3, 0);
+	RegAdminCmd("sm_xm1014", Command_xm1014, 0);
 }
 
 void RemoveWeaponInSlot(client, slot)

@@ -22,11 +22,11 @@ public Action Command_drop(int client, const char[] command, int argc)
 	if (!IsClientInGame(client) || !IsPlayerAlive(client))
 		return Plugin_Continue;
 
-	char weaponClass[32];
 	int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-	if(!IsValidEdict(weapon))
+	if (!IsValidEdict(weapon))
 		return Plugin_Stop;
 
+	char weaponClass[32];
 	GetEdictClassname(weapon, weaponClass, sizeof(weaponClass));
 
 	CS_DropWeapon(client, weapon, true, true);

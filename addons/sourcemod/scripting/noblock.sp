@@ -38,12 +38,11 @@ public void ConVarChanged(ConVar convar, const char[] oldValue, const char[] new
 	}
 }
 
-public Action Event_player_spawn(Event event, const char[] name, bool dontBroadcast)
+public void Event_player_spawn(Event event, const char[] name, bool dontBroadcast)
 {
 	if (GetConVarInt(convarNoblock) == 1)
 	{
 		int client = GetClientOfUserId(event.GetInt("userid"));
 		SetEntProp(client, Prop_Data, "m_CollisionGroup", COLLISION_GROUP_DEBRIS_TRIGGER);
 	}
-	return Plugin_Continue;
 }
