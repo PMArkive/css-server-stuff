@@ -2,6 +2,7 @@
 !*/
 
 !.gitignore
+!cfg/sourcemod/sourcemod.cfg
 !addons/Tickrate_Enabler*
 !addons/sourcemod/scripting/ezhop.sp
 !addons/sourcemod/scripting/noblock.sp
@@ -12,3 +13,4 @@
 !addons/sourcemod/scripting/weapondrops.sp
 !addons/sourcemod/scripting/giveweapons.sp
 !addons/sourcemod/scripting/godonspawn.sp
+!addons/sourcemod/scripting/blockstupidsounds.sp
