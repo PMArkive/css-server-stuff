@@ -42,7 +42,7 @@ public void OnPluginStart()
 
 public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
-	// Ents are recreated every round.
+	// Ents are recreated every round. blah
 	g_numSoundEnts = 0;
 
 	// Find all ambient sounds played by the map.
