@@ -4,7 +4,7 @@
 
 public Plugin myinfo =
 {
-	name = "Ezhop extension",
+	name = "Ezhop",
 	author = "Me",
 	description = "Enable easy bunnyhopping.",
 	version = "1.0",

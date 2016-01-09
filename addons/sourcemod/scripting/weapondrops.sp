@@ -5,9 +5,9 @@
 
 public Plugin myinfo =
 {
-	name = "Weapon drops extension",
+	name = "Drop all & remove drops",
 	author = "Me",
-	description = "Enable dropping of knives & drops are removed.",
+	description = "Enable dropping of knives & all drops are removed.",
 	version = "1.0",
 	url = "https://www.google.com/"
 }

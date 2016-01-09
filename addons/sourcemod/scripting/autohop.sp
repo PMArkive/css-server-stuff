@@ -4,8 +4,8 @@
 
 public Plugin myinfo =
 {
-	name = "Autohop extension",
-	author = "shavit",
+	name = "Autohop",
+	author = "shavit && Me",
 	description = "Enable auto jumping.",
 	version = "1.0",
 	url = "https://www.google.com/"

@@ -4,9 +4,9 @@
 
 public Plugin myinfo =
 {
-	name = "Client-side A & AA extension",
+	name = "Client-side sv_accelerate & sv_airaccelerate",
 	author = "Me",
-	description = "Client-side A & AA changing.",
+	description = "Client-side sv_accelerate & sv_airaccelerate changing.",
 	version = "1.0",
 	url = "https://www.google.com/"
 }

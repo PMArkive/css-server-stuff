@@ -6,8 +6,8 @@
 
 public Plugin myinfo =
 {
-	name = "Block stupid sounds extension",
-	author = "GoD-Tony [Fixed by The Count] && Me",
+	name = "Block stupid sounds",
+	author = "GoD-Tony && The Count && Me",
 	description = "Block all of those stupid sounds and music.",
 	version = "1.0",
 	url = "https://www.google.com/"

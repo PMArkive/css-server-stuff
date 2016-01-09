@@ -6,8 +6,8 @@
 !addons/Tickrate_Enabler*
 !addons/sourcemod/scripting/ezhop.sp
 !addons/sourcemod/scripting/noblock.sp
-!addons/sourcemod/scripting/clcvarstosend.sp
-!addons/sourcemod/scripting/cl_accelerate.sp
+!addons/sourcemod/scripting/clcvars.sp
+!addons/sourcemod/scripting/claccel.sp
 !addons/sourcemod/scripting/mpbhops.sp
 !addons/sourcemod/scripting/autohop.sp
 !addons/sourcemod/scripting/weapondrops.sp

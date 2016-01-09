@@ -4,7 +4,7 @@
 
 public Plugin myinfo =
 {
-	name = "Client-side ConVars extension",
+	name = "Client-side ConVars",
 	author = "Me",
 	description = "Set ConVars on the client.",
 	version = "1.0",
