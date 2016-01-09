@@ -43,12 +43,10 @@ public Action OnPlayerRunCmd(int client, int &buttons)
 	if (autoClients[client] && IsClientInGame(client) &&
 			IsPlayerAlive(client) && !IsFakeClient(client))
 	{
-		int iOldButtons;
-		iOldButtons = GetEntProp(client, Prop_Data, "m_nOldButtons");
-
+		int iOldButtons = GetEntProp(client, Prop_Data, "m_nOldButtons");
 		iOldButtons &= ~IN_JUMP;
 
-		SetEntProp( client, Prop_Data, "m_nOldButtons", iOldButtons );
+		SetEntProp(client, Prop_Data, "m_nOldButtons", iOldButtons);
 
 		// Anti-doublestepping
 		//if ( g_bClientHoldingJump[client] && fFlags & FL_ONGROUND ) buttons |= IN_JUMP;
