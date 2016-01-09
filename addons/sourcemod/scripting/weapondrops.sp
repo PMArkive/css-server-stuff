@@ -26,9 +26,6 @@ public Action Command_drop(int client, const char[] command, int argc)
 	if (!IsValidEdict(weapon))
 		return Plugin_Stop;
 
-	char weaponClass[32];
-	GetEdictClassname(weapon, weaponClass, sizeof(weaponClass));
-
 	CS_DropWeapon(client, weapon, true, true);
 	RemoveEdict(weapon);
 
