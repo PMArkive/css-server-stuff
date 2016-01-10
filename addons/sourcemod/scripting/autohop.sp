@@ -28,14 +28,14 @@ public Action Command_auto(int client, int args)
 {
 	autoClients[client] = true;
 	ReplyToCommand(client, "[BHOP] Enabling autohop");
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
 
 public Action Command_scroll(int client, int args)
 {
 	autoClients[client] = false;
 	ReplyToCommand(client, "[BHOP] Disabling autohop");
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons)

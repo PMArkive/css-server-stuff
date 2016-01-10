@@ -38,47 +38,47 @@ public Action Command_glock(int client, int args)
 {
 	RemoveWeaponInSlot(client, CS_SLOT_SECONDARY);
 	GivePlayerItem(client, "weapon_glock", 0);
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
 
 public Action Command_usp(int client, int args)
 {
 	RemoveWeaponInSlot(client, CS_SLOT_SECONDARY);
 	GivePlayerItem(client, "weapon_usp", 0);
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
 
 public Action Command_knife(int client, int args)
 {
 	RemoveWeaponInSlot(client, CS_SLOT_KNIFE);
 	GivePlayerItem(client, "weapon_knife", 0);
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
 
 public Action Command_scout(int client, int args)
 {
 	RemoveWeaponInSlot(client, CS_SLOT_PRIMARY);
 	GivePlayerItem(client, "weapon_scout", 0);
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
 
 public Action Command_p90(int client, int args)
 {
 	RemoveWeaponInSlot(client, CS_SLOT_PRIMARY);
 	GivePlayerItem(client, "weapon_p90", 0);
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
 
 public Action Command_m3(int client, int args)
 {
 	RemoveWeaponInSlot(client, CS_SLOT_PRIMARY);
 	GivePlayerItem(client, "weapon_m3", 0);
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
 
 public Action Command_xm1014(int client, int args)
 {
 	RemoveWeaponInSlot(client, CS_SLOT_PRIMARY);
 	GivePlayerItem(client, "weapon_xm1014", 0);
-	return Plugin_Continue;
+	return Plugin_Handled;
 }

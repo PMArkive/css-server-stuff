@@ -31,14 +31,14 @@ public Action Command_ezhop(int client, int args)
 {
 	ezhopClients[client] = true;
 	ReplyToCommand(client, "[BHOP] Using ezhop");
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
 
 public Action Command_normalhop(int client, int args)
 {
 	ezhopClients[client] = false;
 	ReplyToCommand(client, "[BHOP] Using normalhop");
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
 
 public void Event_player_jump(Event event, const char[] name, bool dontBroadcast)

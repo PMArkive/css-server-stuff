@@ -21,7 +21,7 @@ public Action Command_clcvar(int client, int args)
 	if (args != 2)
 	{
 		ReplyToCommand(client, "[CLCVARS] Missing arguments");
-		return Plugin_Continue;
+		return Plugin_Handled;
 	}
 
 	char convarName[51];
@@ -41,5 +41,5 @@ public Action Command_clcvar(int client, int args)
 		ReplyToCommand(client, "[CLCVARS] Done");
 	}
 
-	return Plugin_Continue;
+	return Plugin_Handled;
 }
