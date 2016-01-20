@@ -1,7 +1,6 @@
 #pragma semicolon 1
 
 #include <sourcemod>
-//#include <sdktools>
 #include <sdkhooks>
 
 ConVar g_ConVar_Accelerate;
@@ -71,12 +70,14 @@ public void OnPluginStart()
 	HookConVarChange(g_ConVar_Def_AirAccelerate, Event_ConVar_Def_AirAccelerate);
 }
 
-public void Event_ConVar_Def_Accelerate(Handle hConVar, const char[] szOldValue, const char[] szNewValue)
+public void Event_ConVar_Def_Accelerate(Handle hConVar,
+	const char[] szOldValue, const char[] szNewValue)
 {
 	g_flDefAccelerate = StringToFloat(szNewValue);
 }
 
-public void Event_ConVar_Def_AirAccelerate(Handle hConVar, const char[] szOldValue, const char[] szNewValue)
+public void Event_ConVar_Def_AirAccelerate(Handle hConVar,
+	const char[] szOldValue, const char[] szNewValue)
 {
 	g_flDefAirAccelerate = StringToFloat(szNewValue);
 }
@@ -87,69 +88,69 @@ public void OnConfigsExecuted()
 	g_flDefAirAccelerate = GetConVarFloat(g_ConVar_AirAccelerate);
 }
 
-public Action Command_accel(int client, int args)
+public Action Command_accel(int iClient, int args)
 {
 	if (args == 0)
 	{
-		usingClientAccel[client] = false;
-		ReplyToCommand(client, "[ACCEL] Resetting client-side sv_accelerate");
+		usingClientAccel[iClient] = false;
+		ReplyToCommand(iClient, "[ACCEL] Resetting client-side Accel");
 	}
 	else if (args == 1)
 	{
-		char value[20];
-		GetCmdArg(1, value, sizeof(value));
-		float accelerateValue = StringToFloat(value);
+		char buffer[20];
+		GetCmdArg(1, buffer, sizeof(buffer));
+		float accelerateValue = StringToFloat(buffer);
 
 		if (accelerateValue == 0.0)
 		{
-			ReplyToCommand(client, "[ACCEL] Invalid value");
+			ReplyToCommand(iClient, "[ACCEL] Invalid value");
 			return Plugin_Handled;
 		}
 
-		clientAccel[client] = accelerateValue;
-		usingClientAccel[client] = true;
-		ReplyToCommand(client, "[ACCEL] Using custom sv_accelerate");
+		clientAccel[iClient] = accelerateValue;
+		usingClientAccel[iClient] = true;
+		ReplyToCommand(iClient, "[ACCEL] Using custom Accel");
 	}
 	else
 	{
-		ReplyToCommand(client, "[ACCEL] Invalid arguments");
+		ReplyToCommand(iClient, "[ACCEL] Invalid arguments");
 	}
 
 	return Plugin_Handled;
 }
 
-public Action Command_airaccel(int client, int args)
+public Action Command_airaccel(int iClient, int args)
 {
 	if (args == 0)
 	{
-		usingClientAirAccel[client] = false;
-		ReplyToCommand(client, "[AIRACCEL] Stopping client-side sv_airaccelerate");
+		usingClientAirAccel[iClient] = false;
+		ReplyToCommand(iClient, "[AIRACCEL] Stopping client-side AirAccel");
 	}
 	else if (args == 1)
 	{
-		char value[20];
-		GetCmdArg(1, value, sizeof(value));
-		float airaccelerateValue = StringToFloat(value);
+		char buffer[20];
+		GetCmdArg(1, buffer, sizeof(buffer));
+		float airaccelerateValue = StringToFloat(buffer);
 
 		if (airaccelerateValue == 0.0)
 		{
-			ReplyToCommand(client, "[AIRACCEL] Invalid value");
+			ReplyToCommand(iClient, "[AIRACCEL] Invalid value");
 			return Plugin_Handled;
 		}
 
-		clientAirAccel[client] = airaccelerateValue;
-		usingClientAirAccel[client] = true;
-		ReplyToCommand(client, "[AIRACCEL] Using custom sv_airaccelerate");
+		clientAirAccel[iClient] = airaccelerateValue;
+		usingClientAirAccel[iClient] = true;
+		ReplyToCommand(iClient, "[AIRACCEL] Using custom AirAccel");
 	}
 	else
 	{
-		ReplyToCommand(client, "[AIRACCEL] Invalid arguments");
+		ReplyToCommand(iClient, "[AIRACCEL] Invalid arguments");
 	}
 
 	return Plugin_Handled;
 }
 
-public void Event_PreThinkPost_Client(int client)
+public void Event_PreThinkPost_Client(int iClient)
 {
 	// Called before AirMove()
 	// Which is then called for living players that are in the air.
@@ -157,40 +158,40 @@ public void Event_PreThinkPost_Client(int client)
 	// Set our sv_airaccelerate value to client's preferred style.
 	// Airmove calculates acceleration by taking the sv_airaccelerate-cvar value.
 	// This means we can change the value before the calculations happen.
-	SetConVarFloat(g_ConVar_AirAccelerate,(usingClientAirAccel[client]) ?
-		clientAirAccel[client] : g_flDefAirAccelerate);
+	SetConVarFloat(g_ConVar_AirAccelerate,(usingClientAirAccel[iClient]) ?
+		clientAirAccel[iClient] : g_flDefAirAccelerate);
 
-	SetConVarFloat(g_ConVar_Accelerate, (usingClientAccel[client]) ?
-		clientAccel[client] : g_flDefAccelerate);
+	SetConVarFloat(g_ConVar_Accelerate, (usingClientAccel[iClient]) ?
+		clientAccel[iClient] : g_flDefAccelerate);
 }
 
-void SetClientPredictedAcceleration(int client, float aa)
+void SetClientPredictedAcceleration(int iClient, float aa)
 {
 	char szValue[8];
 	FormatEx(szValue, sizeof(szValue), "%0.f", aa);
 
-	SendConVarValue(client, g_ConVar_Accelerate, szValue);
+	SendConVarValue(iClient, g_ConVar_Accelerate, szValue);
 }
 
-void SetClientPredictedAirAcceleration(int client, float aa)
+void SetClientPredictedAirAcceleration(int iClient, float aa)
 {
 	char szValue[8];
 	FormatEx(szValue, sizeof(szValue), "%0.f", aa);
 
-	SendConVarValue(client, g_ConVar_AirAccelerate, szValue);
+	SendConVarValue(iClient, g_ConVar_AirAccelerate, szValue);
 }
 
-public void OnClientPutInServer(int client)
+public void OnClientPutInServer(int iClient)
 {
-	usingClientAccel[client] = false;
-	usingClientAirAccel[client] = false;
+	usingClientAccel[iClient] = false;
+	usingClientAirAccel[iClient] = false;
 
-	SetClientPredictedAcceleration(client , g_flDefAccelerate);
-	SetClientPredictedAirAcceleration(client, g_flDefAirAccelerate);
-	SDKHook(client, SDKHook_PreThinkPost, Event_PreThinkPost_Client);
+	SetClientPredictedAcceleration(iClient , g_flDefAccelerate);
+	SetClientPredictedAirAcceleration(iClient, g_flDefAirAccelerate);
+	SDKHook(iClient, SDKHook_PreThinkPost, Event_PreThinkPost_Client);
 }
 
-public void OnClientDisconnect(int client)
+public void OnClientDisconnect(int iClient)
 {
-	SDKUnhook(client, SDKHook_PreThinkPost, Event_PreThinkPost_Client);
+	SDKUnhook(iClient, SDKHook_PreThinkPost, Event_PreThinkPost_Client);
 }
