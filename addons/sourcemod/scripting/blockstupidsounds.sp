@@ -13,27 +13,26 @@ public Plugin myinfo =
 	url = "https://www.google.com/"
 }
 
-char lameClasses[ 2 ][] = {
+char lameClasses[2][] = {
 	"ambient_generic",
 	"env_soundscape"
 };
 
-public void OnEntityCreated( int ent, const char[] classname )
+public void OnEntityCreated(int ent, const char[] classname)
 {
 	bool found = false;
-	for ( int i = 0; i < sizeof( lameClasses ); ++i )
+	for (int i = 0; i < sizeof(lameClasses); ++i)
 	{
-		if ( StrEqual( classname, lameClasses[ i ], false ) )
+		if (StrEqual(classname, lameClasses[ i ], false))
 		{
 			found = true;
 			break;
 		}
 	}
 
-	if ( !found )
+	if (!found)
 		return;
 
-	PrintToServer( "Killing %s[%d]", classname, ent );
-	// https://github.com/altexdim/sourcemod-plugin-gungame/blob/master/doc/csgo/hacks.txt#L1
-	AcceptEntityInput( ent, "Kill" );
+	PrintToServer("Killing %s[%d]", classname, ent);
+	AcceptEntityInput(ent, "Kill");
 }
