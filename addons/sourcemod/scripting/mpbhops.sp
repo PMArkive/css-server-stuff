@@ -4,14 +4,19 @@
 ** Thanks to Ian (Juan) Cammarata & #sourcemod
 **======================================*/
 
-#define VERSION	"1.0.0.5"
+#define VERSION "1.0.0.5"
 
-#define MAX_BHOPBLOCKS 1024 //max. number of door/button based bhop blocks handled in a map
-#define BLOCK_TELEPORT 0.15 //how long can players stand on the block before getting teleported
-#define BLOCK_COOLDOWN 1.0  //when can they touch the same block again without getting teleported
+//max. number of door/button based bhop blocks handled in a map
+#define MAX_BHOPBLOCKS 1024
+//how long can players stand on the block before getting teleported
+#define BLOCK_TELEPORT 0.15
+//when can they touch the same block again without getting teleported
+#define BLOCK_COOLDOWN 1.0
 
-#define COLOR_DOOR   {0, 200, 0, 255}   //rgba value to color door blocks if cvar is enabled
-#define COLOR_BUTTON {200, 0, 200, 255} //rgba value to color button blocks if cvar is enabled
+//rgba value to color door blocks if cvar is enabled
+#define COLOR_DOOR   {0, 200, 0, 255}
+//rgba value to color button blocks if cvar is enabled
+#define COLOR_BUTTON {200, 0, 200, 255}
 
 
 #include <sourcemod>
@@ -19,7 +24,8 @@
 #include <sdkhooks>
 #include <smlib>
 
-public Plugin:myinfo = {
+public Plugin:myinfo =
+{
 	name = "Multiplayer Bunnyhops: Source",
 	author = "DaFox & petsku & unbiased george",
 	description = "Allows players to jump on bhop maps, without the blocks being triggered but push the player off if they fail to bhop",
@@ -27,63 +33,68 @@ public Plugin:myinfo = {
 	url = "http://www.google.com/"
 }
 
+//=============================================================================
+//=============================================================================
+
+//dont move when fired
+#define SF_BUTTON_DONTMOVE        (1 << 0)
+//button fires when touched
+#define SF_BUTTON_TOUCH_ACTIVATES (1 << 8)
+//player touch opens
+#define SF_DOOR_PTOUCH            (1 << 10)
+
+bool g_bLateLoaded = false
+bool g_bMapEnding = false
+
+int g_iBhopDoorList[MAX_BHOPBLOCKS]
+int g_iBhopDoorTeleList[MAX_BHOPBLOCKS]
+int g_iBhopDoorCount
+
+float g_iBhopDoorSp[300]
+
+int g_iBhopButtonList[MAX_BHOPBLOCKS]
+int g_iBhopButtonTeleList[MAX_BHOPBLOCKS]
+int g_iBhopButtonCount
+
+int g_iOffs_clrRender = -1
+int g_iOffs_vecOrigin = -1
+int g_iOffs_vecMins = -1
+int g_iOffs_vecMaxs = -1
+
+int g_iDoorOffs_vecPosition1 = -1
+int g_iDoorOffs_vecPosition2 = -1
+int g_iDoorOffs_flSpeed = -1
+int g_iDoorOffs_spawnflags = -1
+int g_iDoorOffs_NoiseMoving = -1
+int g_iDoorOffs_sLockedSound = -1
+int g_iDoorOffs_bLocked = -1
+
+int g_iButtonOffs_vecPosition1 = -1
+int g_iButtonOffs_vecPosition2 = -1
+int g_iButtonOffs_flSpeed = -1
+int g_iButtonOffs_spawnflags = -1
+
+Handle g_hCvar_Enable = INVALID_HANDLE
+Handle g_hCvar_Color = INVALID_HANDLE
+Handle g_hSDK_Touch = INVALID_HANDLE
+
+char gS_CurrentMap[32];
+
 //=============================================================================================
 //=============================================================================================
 
-
-#define SF_BUTTON_DONTMOVE        (1 << 0)  //dont move when fired
-#define SF_BUTTON_TOUCH_ACTIVATES (1 << 8)  //button fires when touched
-#define SF_DOOR_PTOUCH            (1 << 10) //player touch opens
-
-new bool:g_bLateLoaded = false
-new bool:g_bMapEnding = false
-
-new g_iBhopDoorList[MAX_BHOPBLOCKS]
-new g_iBhopDoorTeleList[MAX_BHOPBLOCKS]
-new g_iBhopDoorCount
-
-new Float:g_iBhopDoorSp[300]
-
-new g_iBhopButtonList[MAX_BHOPBLOCKS]
-new g_iBhopButtonTeleList[MAX_BHOPBLOCKS]
-new g_iBhopButtonCount
-
-new g_iOffs_clrRender = -1
-new g_iOffs_vecOrigin = -1
-new g_iOffs_vecMins = -1
-new g_iOffs_vecMaxs = -1
-
-new g_iDoorOffs_vecPosition1 = -1
-new g_iDoorOffs_vecPosition2 = -1
-new g_iDoorOffs_flSpeed = -1
-new g_iDoorOffs_spawnflags = -1
-new g_iDoorOffs_NoiseMoving = -1
-new g_iDoorOffs_sLockedSound = -1
-new g_iDoorOffs_bLocked = -1
-
-new g_iButtonOffs_vecPosition1 = -1
-new g_iButtonOffs_vecPosition2 = -1
-new g_iButtonOffs_flSpeed = -1
-new g_iButtonOffs_spawnflags = -1
-
-new Handle:g_hCvar_Enable = INVALID_HANDLE
-new Handle:g_hCvar_Color = INVALID_HANDLE
-new Handle:g_hSDK_Touch = INVALID_HANDLE
-
-new String:gS_CurrentMap[32];
-
-//=============================================================================================
-//=============================================================================================
-
-public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) {
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
 	g_bLateLoaded = late
 	return APLRes_Success
 }
 
-public OnPluginStart() {
-	new Handle:hGameConf = LoadGameConfigFile("sdkhooks.games")
+public OnPluginStart()
+{
+	Handle hGameConf = LoadGameConfigFile("sdkhooks.games")
 
-	if (hGameConf == INVALID_HANDLE) {
+	if (hGameConf == INVALID_HANDLE)
+	{
 		SetFailState("GameConfigFile sdkhooks.games was not found")
 		return
 	}
@@ -94,12 +105,13 @@ public OnPluginStart() {
 	g_hSDK_Touch = EndPrepSDKCall()
 	CloseHandle(hGameConf)
 
-	if (g_hSDK_Touch == INVALID_HANDLE) {
+	if (g_hSDK_Touch == INVALID_HANDLE)
+	{
 		SetFailState("Unable to prepare virtual function CBaseEntity::Touch")
 		return
 	}
 
-	CreateConVar("mpbhops_version",VERSION, "Multiplayer Bunnyhops: Source", FCVAR_NOTIFY)
+	CreateConVar("mpbhops_version", VERSION, "Multiplayer Bunnyhops: Source", FCVAR_NOTIFY)
 	g_hCvar_Enable = CreateConVar("mpbhops_enable", "1", "Enable/disable Multiplayer Bunnyhops: Source", FCVAR_NOTIFY)
 	g_hCvar_Color = CreateConVar("mpbhops_color", "0", "If enabled, marks hooked bhop blocks with colors", FCVAR_NOTIFY)
 
@@ -123,16 +135,21 @@ public OnMapStart()
 }
 
 public OnMapEnd()
-{ //DF 2012 Jan 20 - I don't know what the fuck is going on here, but I'm too afraid to touch it. It's likely just cruft that should be removed.
+{
+	//DF 2012 Jan 20 - I don't know what the fuck is going on here, but I'm too afraid to touch it. It's likely just cruft that should be removed.
 	g_bMapEnding = true
 	SetConVarBool(g_hCvar_Enable, GetConVarBool(g_hCvar_Enable)) //DF 2012 Jan 20 - This used to always set it to true, Causing the plugin to turn on
 	g_bMapEnding = false										// automatically at map change, even if it was disabled.
 }
 
-public OnPluginPauseChange(bool:pause) {
-	if (pause) {
+public OnPluginPauseChange(bool:pause)
+{
+	if (pause)
+	{
 		OnPluginEnd()
-	} else if (GetConVarBool(g_hCvar_Enable)) {
+	}
+	else if (GetConVarBool(g_hCvar_Enable))
+	{
 		g_iBhopDoorCount = 0
 		g_iBhopButtonCount = 0
 
@@ -154,31 +171,36 @@ public OnPluginEnd()
 //=============================================================================================
 //=============================================================================================
 
-public Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
+public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
 	OnPluginPauseChange(false)
 }
 
 public Entity_BoostTouch(bhop,client)
 {
-	if (0 < client <= MaxClients) {
-		new Float:speed = -1.0;
+	if (0 < client <= MaxClients)
+	{
+		float speed = -1.0;
 
-		for (int i = 0; i < g_iBhopDoorCount; i++) {
-			if (bhop == g_iBhopDoorList[i]) {
+		for (int i = 0; i < g_iBhopDoorCount; i++)
+		{
+			if (bhop == g_iBhopDoorList[i])
+			{
 				speed = g_iBhopDoorSp[i]
 				break
 			}
 		}
 
-		if (speed != -1 && speed) {
-			new Float:ovel[3]
+		if (speed != -1 && speed)
+		{
+			float ovel[3]
 			Entity_GetBaseVelocity(client, ovel)
-			new Float:evel[3]
+			float evel[3]
 			Entity_GetLocalVelocity(client, evel)
+
 			if (ovel[2] < speed && evel[2] < speed)
 			{
-				new Float:vel[3]
+				float vel[3]
 				vel[0] = Float:0
 				vel[1] = Float:0
 				vel[2] = speed * 1.8
@@ -190,29 +212,38 @@ public Entity_BoostTouch(bhop,client)
 
 public Entity_Touch(bhop,client)
 {
-	if (0 < client <= MaxClients) {
-		static Float:flPunishTime[MAXPLAYERS + 1], iLastBlock[MAXPLAYERS + 1] = { -1,... }
-		new Float:time = GetEngineTime(), Float:diff = time - flPunishTime[client]
+	if (0 < client <= MaxClients
+	{
+		static float flPunishTime[MAXPLAYERS + 1], iLastBlock[MAXPLAYERS + 1] = { -1,... }
+		float time = GetEngineTime(), Float:diff = time - flPunishTime[client]
 
-		if (iLastBlock[client] != bhop || diff > BLOCK_COOLDOWN) {
+		if (iLastBlock[client] != bhop || diff > BLOCK_COOLDOWN)
+		{
 			iLastBlock[client] = bhop
 			flPunishTime[client] = time + BLOCK_TELEPORT
-		} else if (diff > BLOCK_TELEPORT) {
+		}
+		else if (diff > BLOCK_TELEPORT)
+		{
 			decl i
 			new tele = -1, ent = iLastBlock[client]
 
 			iLastBlock[client] = -1
 
-			for (i = 0; i < g_iBhopDoorCount; i++) {
-				if (ent == g_iBhopDoorList[i]) {
+			for (i = 0; i < g_iBhopDoorCount; i++)
+			{
+				if (ent == g_iBhopDoorList[i])
+				{
 					tele = g_iBhopDoorTeleList[i]
 					break
 				}
 			}
 
-			if (tele == -1) {
-				for (i = 0; i < g_iBhopButtonCount; i++) {
-					if (ent == g_iBhopButtonList[i]) {
+			if (tele == -1)
+			{
+				for (i = 0; i < g_iBhopButtonCount; i++)
+				{
+					if (ent == g_iBhopButtonList[i])
+					{
 						tele = g_iBhopButtonTeleList[i]
 						break
 					}
@@ -230,7 +261,7 @@ public ConVarChanged_Enable(Handle:convar,const String:oldValue[],const String:n
 	if (g_bMapEnding)
 		return
 
-	new bool:bEnabled = StringToInt(newValue) ? true : false
+	bool bEnabled = StringToInt(newValue) ? true : false
 
 	if (bEnabled != (StringToInt(oldValue) ? true : false))
 		OnPluginPauseChange(!bEnabled)
@@ -241,7 +272,7 @@ public ConVarChanged_Color(Handle:convar, const String:oldValue[], const String:
 	if (!GetConVarBool(g_hCvar_Enable))
 		return
 
-	new bool:bEnabled = StringToInt(newValue) ? true : false
+	bool bEnabled = StringToInt(newValue) ? true : false
 
 	if (bEnabled != (StringToInt(oldValue) ? true : false))
 		ColorBlocks(!bEnabled)
@@ -252,11 +283,18 @@ public ConVarChanged_Color(Handle:convar, const String:oldValue[], const String:
 
 FindBhopBlocks()
 {
-	decl Float:startpos[3], Float:endpos[3], Float:mins[3], Float:maxs[3], tele
-	new ent = -1
+	//decl
+	float startpos[3]
+	float endpos[3]
+	float mins[3]
+	float maxs[3]
+	float tele
+	int ent = -1
 
-	while ((ent = FindEntityByClassname(ent,"func_door")) != -1) {
-		if (g_iDoorOffs_vecPosition1 == -1) {
+	while ((ent = FindEntityByClassname(ent,"func_door")) != -1)
+	{
+		if (g_iDoorOffs_vecPosition1 == -1)
+		{
 			g_iDoorOffs_vecPosition1 = FindDataMapInfo(ent, "m_vecPosition1")
 			g_iDoorOffs_vecPosition2 = FindDataMapInfo(ent, "m_vecPosition2")
 			g_iDoorOffs_flSpeed = FindDataMapInfo(ent, "m_flSpeed")
@@ -271,19 +309,22 @@ FindBhopBlocks()
 
 		GetEntDataVector(ent, g_iOffs_vecMins, mins)
 		GetEntDataVector(ent, g_iOffs_vecMaxs, maxs)
-		new Float:speed = GetEntDataFloat(ent, g_iDoorOffs_flSpeed)
+		float speed = GetEntDataFloat(ent, g_iDoorOffs_flSpeed)
 
-		if (!StrEqual(gS_CurrentMap, "bhop_monster_jam", false) && (maxs[2] - mins[2]) < 80 && (startpos[2] > endpos[2] || speed > 100))
+		if (!StrEqual(gS_CurrentMap, "bhop_monster_jam", false) &&
+			(maxs[2] - mins[2]) < 80 && (startpos[2] > endpos[2] || speed > 100))
 		{
 			startpos[0] += (mins[0] + maxs[0]) * 0.5
 			startpos[1] += (mins[1] + maxs[1]) * 0.5
 			startpos[2] += maxs[2]
 
-			if ((tele = CustomTraceForTeleports(startpos, endpos[2] + maxs[2])) != -1 || (speed > 100 && startpos[2] < endpos[2])) {
+			if ((tele = CustomTraceForTeleports(startpos, endpos[2] + maxs[2])) != -1 ||
+				(speed > 100 && startpos[2] < endpos[2]))
+			{
 				g_iBhopDoorList[g_iBhopDoorCount] = ent
 				g_iBhopDoorTeleList[g_iBhopDoorCount] = tele
 
-				if (++g_iBhopDoorCount == sizeof g_iBhopDoorList)
+				if (++g_iBhopDoorCount == sizeof(g_iBhopDoorList))
 					break
 			}
 		}
@@ -291,8 +332,10 @@ FindBhopBlocks()
 
 	ent = -1
 
-	while ((ent = FindEntityByClassname(ent, "func_button")) != -1) {
-		if (g_iButtonOffs_vecPosition1 == -1) {
+	while ((ent = FindEntityByClassname(ent, "func_button")) != -1)
+	{
+		if (g_iButtonOffs_vecPosition1 == -1)
+		{
 			g_iButtonOffs_vecPosition1 = FindDataMapInfo(ent, "m_vecPosition1")
 			g_iButtonOffs_vecPosition2 = FindDataMapInfo(ent, "m_vecPosition2")
 			g_iButtonOffs_flSpeed = FindDataMapInfo(ent, "m_flSpeed")
@@ -302,7 +345,9 @@ FindBhopBlocks()
 		GetEntDataVector(ent, g_iButtonOffs_vecPosition1, startpos)
 		GetEntDataVector(ent, g_iButtonOffs_vecPosition2, endpos)
 
-		if (startpos[2] > endpos[2] && (GetEntData(ent, g_iButtonOffs_spawnflags, 4) & SF_BUTTON_TOUCH_ACTIVATES)) {
+		if (startpos[2] > endpos[2] &&
+			(GetEntData(ent, g_iButtonOffs_spawnflags, 4) & SF_BUTTON_TOUCH_ACTIVATES))
+		{
 			GetEntDataVector(ent,g_iOffs_vecMins,mins)
 			GetEntDataVector(ent,g_iOffs_vecMaxs,maxs)
 
@@ -310,11 +355,12 @@ FindBhopBlocks()
 			startpos[1] += (mins[1] + maxs[1]) * 0.5
 			startpos[2] += maxs[2]
 
-			if ((tele = CustomTraceForTeleports(startpos, endpos[2] + maxs[2])) != -1) {
+			if ((tele = CustomTraceForTeleports(startpos, endpos[2] + maxs[2])) != -1)
+			{
 				g_iBhopButtonList[g_iBhopButtonCount] = ent
 				g_iBhopButtonTeleList[g_iBhopButtonCount] = tele
 
-				if (++g_iBhopButtonCount == sizeof g_iBhopButtonList)
+				if (++g_iBhopButtonCount == sizeof(g_iBhopButtonList))
 					break
 			}
 		}
@@ -323,24 +369,27 @@ FindBhopBlocks()
 	AlterBhopBlocks(false)
 }
 
-AlterBhopBlocks(bool:bRevertChanges)
+AlterBhopBlocks(bool bRevertChanges)
 {
-	static Float:vecDoorPosition2[sizeof g_iBhopDoorList][3]
-	static Float:flDoorSpeed[sizeof g_iBhopDoorList]
-	static iDoorSpawnflags[sizeof g_iBhopDoorList]
-	static bool:bDoorLocked[sizeof g_iBhopDoorList]
+	static float vecDoorPosition2[sizeof(g_iBhopDoorList)][3]
+	static float flDoorSpeed[sizeof(g_iBhopDoorList)]
+	static iDoorSpawnflags[sizeof(g_iBhopDoorList)]
+	static bool bDoorLocked[sizeof(g_iBhopDoorList)]
 
-	static Float:vecButtonPosition2[sizeof g_iBhopButtonList][3]
-	static Float:flButtonSpeed[sizeof g_iBhopButtonList]
-	static iButtonSpawnflags[sizeof g_iBhopButtonList]
+	static float vecButtonPosition2[sizeof(g_iBhopButtonList)][3]
+	static float flButtonSpeed[sizeof(g_iBhopButtonList)]
+	static iButtonSpawnflags[sizeof(g_iBhopButtonList)]
 
 	decl ent, i
 
-	if (bRevertChanges) {
-		for (i = 0; i < g_iBhopDoorCount; i++) {
+	if (bRevertChanges)
+	{
+		for (i = 0; i < g_iBhopDoorCount; i++)
+		{
 			ent = g_iBhopDoorList[i]
 
-			if (IsValidEntity(ent)) {
+			if (IsValidEntity(ent))
+			{
 				SetEntDataVector(ent, g_iDoorOffs_vecPosition2, vecDoorPosition2[i])
 				SetEntDataFloat(ent, g_iDoorOffs_flSpeed, flDoorSpeed[i])
 				SetEntData(ent, g_iDoorOffs_spawnflags, iDoorSpawnflags[i],4)
@@ -355,10 +404,12 @@ AlterBhopBlocks(bool:bRevertChanges)
 			}
 		}
 
-		for (i = 0; i < g_iBhopButtonCount; i++) {
+		for (i = 0; i < g_iBhopButtonCount; i++)
+		{
 			ent = g_iBhopButtonList[i]
 
-			if (IsValidEntity(ent)) {
+			if (IsValidEntity(ent))
+			{
 				SetEntDataVector(ent, g_iButtonOffs_vecPosition2, vecButtonPosition2[i])
 				SetEntDataFloat(ent, g_iButtonOffs_flSpeed, flButtonSpeed[i])
 				SetEntData(ent, g_iButtonOffs_spawnflags, iButtonSpawnflags[i],4)
@@ -366,10 +417,13 @@ AlterBhopBlocks(bool:bRevertChanges)
 				SDKUnhook(ent, SDKHook_Touch, Entity_Touch)
 			}
 		}
-	} else {	//note: This only gets called directly after finding the blocks, so the entities are valid.
+	}
+	else
+	{	//note: This only gets called directly after finding the blocks, so the entities are valid.
 		decl Float:startpos[3]
 
-		for (i = 0; i < g_iBhopDoorCount; i++) {
+		for (i = 0; i < g_iBhopDoorCount; i++)
+		{
 			ent = g_iBhopDoorList[i]
 
 			GetEntDataVector(ent, g_iDoorOffs_vecPosition2, vecDoorPosition2[i])
@@ -397,7 +451,8 @@ AlterBhopBlocks(bool:bRevertChanges)
 			}
 		}
 
-		for (i = 0; i < g_iBhopButtonCount; i++) {
+		for (i = 0; i < g_iBhopButtonCount; i++)
+		{
 			ent = g_iBhopButtonList[i]
 
 			GetEntDataVector(ent, g_iButtonOffs_vecPosition2, vecButtonPosition2[i])
@@ -419,41 +474,50 @@ AlterBhopBlocks(bool:bRevertChanges)
 		ColorBlocks(bRevertChanges)
 }
 
-ColorBlocks(bool:bRevertChanges) {
-	static iDoorClrRender[sizeof g_iBhopDoorList][4]
-	static iButtonClrRender[sizeof g_iBhopButtonList][4]
+ColorBlocks(bool:bRevertChanges)
+{
+	static iDoorClrRender[sizeof(g_iBhopDoorList)][4]
+	static iButtonClrRender[sizeof(g_iBhopButtonList)][4]
 
 	decl ent, i
 
-	if (bRevertChanges) {
-		for (i = 0; i < g_iBhopDoorCount; i++) {
+	if (bRevertChanges)
+	{
+		for (i = 0; i < g_iBhopDoorCount; i++)
+		{
 			ent = g_iBhopDoorList[i]
 
 			if (IsValidEntity(ent))
 				SetEntDataArray(ent, g_iOffs_clrRender, iDoorClrRender[i], sizeof iDoorClrRender[], 1, true)
 		}
 
-		for (i = 0; i < g_iBhopButtonCount; i++) {
+		for (i = 0; i < g_iBhopButtonCount; i++)
+		{
 			ent = g_iBhopButtonList[i]
 
 			if (IsValidEntity(ent))
 				SetEntDataArray(ent, g_iOffs_clrRender, iButtonClrRender[i], sizeof iButtonClrRender[], 1, true)
 		}
 	}
-	else {
-		for (i = 0; i < g_iBhopDoorCount; i++) {
+	else
+	{
+		for (i = 0; i < g_iBhopDoorCount; i++)
+		{
 			ent = g_iBhopDoorList[i]
 
-			if (IsValidEntity(ent)) {
+			if (IsValidEntity(ent))
+			{
 				GetEntDataArray(ent, g_iOffs_clrRender, iDoorClrRender[i], sizeof iDoorClrRender[], 1)
 				SetEntDataArray(ent, g_iOffs_clrRender, COLOR_DOOR, 4, 1, true)
 			}
 		}
 
-		for (i = 0; i < g_iBhopButtonCount; i++) {
+		for (i = 0; i < g_iBhopButtonCount; i++)
+		{
 			ent = g_iBhopButtonList[i]
 
-			if (IsValidEntity(ent)) {
+			if (IsValidEntity(ent))
+			{
 				GetEntDataArray(ent, g_iOffs_clrRender, iButtonClrRender[i], sizeof iButtonClrRender[], 1)
 				SetEntDataArray(ent, g_iOffs_clrRender, COLOR_BUTTON, 4, 1, true)
 			}
@@ -461,22 +525,31 @@ ColorBlocks(bool:bRevertChanges) {
 	}
 }
 
-CustomTraceForTeleports(const Float:startpos[3], Float:endheight, Float:step=1.0) {
-	decl teleports[512]
-	new tpcount, ent = -1
+CustomTraceForTeleports(const float startpos[3], float endheight, float step=1.0)
+{
+	decl int teleports[512]
+	int tpcount, ent = -1
 
-	while ((ent = FindEntityByClassname(ent, "trigger_teleport")) != -1 && tpcount != sizeof teleports) {
+	while ((ent = FindEntityByClassname(ent, "trigger_teleport")) != -1 &&
+		tpcount != sizeof(teleports))
+	{
 		teleports[tpcount++] = ent
 	}
 
-	decl Float:mins[3], Float:maxs[3], Float:origin[3], i
+	//decl
+	float mins[3]
+	float maxs[3]
+	float origin[3]
+	float i
 
 	origin[0] = startpos[0]
 	origin[1] = startpos[1]
 	origin[2] = startpos[2]
 
-	do {
-		for (i = 0; i < tpcount; i++) {
+	do
+	{
+		for (i = 0; i < tpcount; i++)
+		{
 			ent = teleports[i]
 			GetAbsBoundingBox(ent, mins, maxs)
 
@@ -490,8 +563,9 @@ CustomTraceForTeleports(const Float:startpos[3], Float:endheight, Float:step=1.0
 	return -1
 }
 
-GetAbsBoundingBox(ent,Float:mins[3], Float:maxs[3]) {
-	decl Float:origin[3]
+GetAbsBoundingBox(ent, float mins[3], float maxs[3])
+{
+	decl float origin[3]
 
 	GetEntDataVector(ent, g_iOffs_vecOrigin, origin)
 	GetEntDataVector(ent, g_iOffs_vecMins, mins)
