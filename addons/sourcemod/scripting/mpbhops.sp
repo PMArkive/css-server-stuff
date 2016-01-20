@@ -142,7 +142,7 @@ public OnMapEnd()
 	g_bMapEnding = false										// automatically at map change, even if it was disabled.
 }
 
-public OnPluginPauseChange(bool:pause)
+public OnPluginPauseChange(bool pause)
 {
 	if (pause)
 	{
@@ -176,13 +176,13 @@ public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast
 	OnPluginPauseChange(false)
 }
 
-public Entity_BoostTouch(bhop,client)
+public Entity_BoostTouch(int bhop, int client)
 {
 	if (0 < client <= MaxClients)
 	{
 		float speed = -1.0;
 
-		for (int i = 0; i < g_iBhopDoorCount; i++)
+		for (int i = 0; i < g_iBhopDoorCount; ++i)
 		{
 			if (bhop == g_iBhopDoorList[i])
 			{
@@ -210,7 +210,7 @@ public Entity_BoostTouch(bhop,client)
 	}
 }
 
-public Entity_Touch(bhop,client)
+public Entity_Touch(int bhop, int client)
 {
 	if (0 < client <= MaxClients
 	{
@@ -229,7 +229,7 @@ public Entity_Touch(bhop,client)
 
 			iLastBlock[client] = -1
 
-			for (i = 0; i < g_iBhopDoorCount; i++)
+			for (i = 0; i < g_iBhopDoorCount; ++i)
 			{
 				if (ent == g_iBhopDoorList[i])
 				{
@@ -240,7 +240,7 @@ public Entity_Touch(bhop,client)
 
 			if (tele == -1)
 			{
-				for (i = 0; i < g_iBhopButtonCount; i++)
+				for (i = 0; i < g_iBhopButtonCount; ++i)
 				{
 					if (ent == g_iBhopButtonList[i])
 					{
@@ -256,7 +256,7 @@ public Entity_Touch(bhop,client)
 	}
 }
 
-public ConVarChanged_Enable(Handle:convar,const String:oldValue[],const String:newValue[])
+public ConVarChanged_Enable(Handle convar, const char[] oldValue, const char[] newValue)
 {
 	if (g_bMapEnding)
 		return
@@ -267,7 +267,7 @@ public ConVarChanged_Enable(Handle:convar,const String:oldValue[],const String:n
 		OnPluginPauseChange(!bEnabled)
 }
 
-public ConVarChanged_Color(Handle:convar, const String:oldValue[], const String:newValue[])
+public ConVarChanged_Color(Handle convar, const char[] oldValue, const char[] newValue)
 {
 	if (!GetConVarBool(g_hCvar_Enable))
 		return
@@ -380,11 +380,12 @@ AlterBhopBlocks(bool bRevertChanges)
 	static float flButtonSpeed[sizeof(g_iBhopButtonList)]
 	static iButtonSpawnflags[sizeof(g_iBhopButtonList)]
 
-	decl ent, i
+	int ent
+	int i
 
 	if (bRevertChanges)
 	{
-		for (i = 0; i < g_iBhopDoorCount; i++)
+		for (i = 0; i < g_iBhopDoorCount; ++i)
 		{
 			ent = g_iBhopDoorList[i]
 
@@ -404,7 +405,7 @@ AlterBhopBlocks(bool bRevertChanges)
 			}
 		}
 
-		for (i = 0; i < g_iBhopButtonCount; i++)
+		for (i = 0; i < g_iBhopButtonCount; ++i)
 		{
 			ent = g_iBhopButtonList[i]
 
@@ -419,10 +420,12 @@ AlterBhopBlocks(bool bRevertChanges)
 		}
 	}
 	else
-	{	//note: This only gets called directly after finding the blocks, so the entities are valid.
-		decl Float:startpos[3]
+	{
+		//note: This only gets called directly after finding the blocks, so the entities are valid.
 
-		for (i = 0; i < g_iBhopDoorCount; i++)
+		float startpos[3]
+
+		for (i = 0; i < g_iBhopDoorCount; ++i)
 		{
 			ent = g_iBhopDoorList[i]
 
@@ -451,7 +454,7 @@ AlterBhopBlocks(bool bRevertChanges)
 			}
 		}
 
-		for (i = 0; i < g_iBhopButtonCount; i++)
+		for (i = 0; i < g_iBhopButtonCount; ++i)
 		{
 			ent = g_iBhopButtonList[i]
 
@@ -479,11 +482,12 @@ ColorBlocks(bool:bRevertChanges)
 	static iDoorClrRender[sizeof(g_iBhopDoorList)][4]
 	static iButtonClrRender[sizeof(g_iBhopButtonList)][4]
 
-	decl ent, i
+	int ent
+	int i
 
 	if (bRevertChanges)
 	{
-		for (i = 0; i < g_iBhopDoorCount; i++)
+		for (i = 0; i < g_iBhopDoorCount; ++i)
 		{
 			ent = g_iBhopDoorList[i]
 
@@ -491,7 +495,7 @@ ColorBlocks(bool:bRevertChanges)
 				SetEntDataArray(ent, g_iOffs_clrRender, iDoorClrRender[i], sizeof iDoorClrRender[], 1, true)
 		}
 
-		for (i = 0; i < g_iBhopButtonCount; i++)
+		for (i = 0; i < g_iBhopButtonCount; ++i)
 		{
 			ent = g_iBhopButtonList[i]
 
@@ -501,7 +505,7 @@ ColorBlocks(bool:bRevertChanges)
 	}
 	else
 	{
-		for (i = 0; i < g_iBhopDoorCount; i++)
+		for (i = 0; i < g_iBhopDoorCount; ++i)
 		{
 			ent = g_iBhopDoorList[i]
 
@@ -512,7 +516,7 @@ ColorBlocks(bool:bRevertChanges)
 			}
 		}
 
-		for (i = 0; i < g_iBhopButtonCount; i++)
+		for (i = 0; i < g_iBhopButtonCount; ++i)
 		{
 			ent = g_iBhopButtonList[i]
 
