@@ -212,10 +212,12 @@ public Entity_BoostTouch(int bhop, int client)
 
 public Entity_Touch(int bhop, int client)
 {
-	if (0 < client <= MaxClients
+	if (0 < client && client <= MaxClients)
 	{
-		static float flPunishTime[MAXPLAYERS + 1], iLastBlock[MAXPLAYERS + 1] = { -1,... }
-		float time = GetEngineTime(), Float:diff = time - flPunishTime[client]
+		static float flPunishTime[MAXPLAYERS + 1]
+		static int iLastBlock[MAXPLAYERS + 1] = { -1,... }
+		float time = GetEngineTime()
+		float diff = time - flPunishTime[client]
 
 		if (iLastBlock[client] != bhop || diff > BLOCK_COOLDOWN)
 		{
@@ -288,7 +290,7 @@ FindBhopBlocks()
 	float endpos[3]
 	float mins[3]
 	float maxs[3]
-	float tele
+	int tele
 	int ent = -1
 
 	while ((ent = FindEntityByClassname(ent,"func_door")) != -1)
@@ -531,8 +533,9 @@ ColorBlocks(bool:bRevertChanges)
 
 CustomTraceForTeleports(const float startpos[3], float endheight, float step=1.0)
 {
-	decl int teleports[512]
-	int tpcount, ent = -1
+	int teleports[512]
+	int tpcount
+	int ent = -1
 
 	while ((ent = FindEntityByClassname(ent, "trigger_teleport")) != -1 &&
 		tpcount != sizeof(teleports))
@@ -544,7 +547,7 @@ CustomTraceForTeleports(const float startpos[3], float endheight, float step=1.0
 	float mins[3]
 	float maxs[3]
 	float origin[3]
-	float i
+	int i
 
 	origin[0] = startpos[0]
 	origin[1] = startpos[1]
@@ -569,7 +572,7 @@ CustomTraceForTeleports(const float startpos[3], float endheight, float step=1.0
 
 GetAbsBoundingBox(ent, float mins[3], float maxs[3])
 {
-	decl float origin[3]
+	float origin[3]
 
 	GetEntDataVector(ent, g_iOffs_vecOrigin, origin)
 	GetEntDataVector(ent, g_iOffs_vecMins, mins)
